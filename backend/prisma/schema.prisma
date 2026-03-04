@@ -1,0 +1,54 @@
+// Prisma schema for SafeVault project
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  //url      = env("DATABASE_URL")
+}
+
+enum Status {
+  AVAILABLE
+  ASSIGNED
+  UNDER_REPAIR
+}
+
+model Department {
+  id       Int        @id @default(autoincrement())
+  name     String
+  location String
+  employees Employee[]
+}
+
+model Employee {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  assets       Asset[]
+}
+
+model Asset {
+  id           Int           @id @default(autoincrement())
+  serialNumber String        @unique
+  model        String
+  category     String
+  value        Float
+  purchaseDate DateTime
+  status       Status        @default(AVAILABLE)
+  employee     Employee?     @relation(fields: [employeeId], references: [id])
+  employeeId   Int?
+  maintenance  MaintenanceLog[]
+}
+
+model MaintenanceLog {
+  id          Int      @id @default(autoincrement())
+  asset       Asset    @relation(fields: [assetId], references: [id])
+  assetId     Int
+  description String
+  cost        Float
+  entryDate   DateTime @default(now())
+}
