@@ -23,7 +23,7 @@ export async function createAsset(req: Request, res: Response) {
 
 export async function getAsset(req: Request, res: Response) {
   try {
-    const asset = await assetService.getAsset(parseInt(req.params.id));
+    const asset = await assetService.getAsset(parseInt(req.params.id as string));
     if (!asset) {
       return res.status(404).json({ error: "Asset not found" });
     }
@@ -31,5 +31,15 @@ export async function getAsset(req: Request, res: Response) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch asset" });
+  }
+}
+
+export async function deleteAsset(req: Request, res: Response) {
+  try {
+    await assetService.deleteAsset(parseInt(req.params.id as string));
+    res.status(200).json({ message: "Asset deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete asset" });
   }
 }

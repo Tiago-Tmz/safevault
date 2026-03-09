@@ -22,3 +22,7 @@ export function getAsset(id: number) {
     include: { employee: { include: { department: true } }, maintenance: true },
   });
 }
+
+export function deleteAsset(id: number) {
+  return prisma.asset.delete({ where: { id } });
+}

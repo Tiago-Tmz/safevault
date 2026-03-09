@@ -54,6 +54,16 @@ function App() {
     }
   }
 
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:4000/api/assets/${id}`);
+      setAssets(assets.filter(asset => asset.id !== id));
+      
+    } catch (err) {
+      console.error("Erro ao deletar equipamento:", err);
+    }
+  }
+
 
   return (
     <div style={{ padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#f4f4f9', minHeight: '100vh' }}>
@@ -96,6 +106,7 @@ function App() {
           <button type="submit" style={{ padding: '10px', backgroundColor: '#0056b3', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Adicionar Ativo</button>
         </div>
       </form>
+      
 
       {assets.length === 0 ? (
         <p>Nenhum equipamento encontrado...</p>
@@ -107,6 +118,8 @@ function App() {
               <p style={{ margin: '5px 0', color: '#333' }}><strong>S/N:</strong> {asset.serialNumber}</p>
               <p style={{ margin: '5px 0', color: '#333' }}><strong>Categoria:</strong> {asset.category}</p>
               <p style={{ margin: '5px 0', color: '#333' }}><strong>Valor:</strong> {asset.value} €</p>
+              <button onClick={() => handleDelete(asset.id)} style={{ marginTop: '10px', padding: '8px', backgroundColor: '#d9534f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Apagar</button>
+              
             </div>
           ))}
         </div>
