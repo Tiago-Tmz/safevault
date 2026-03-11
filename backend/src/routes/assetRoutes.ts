@@ -13,6 +13,9 @@ router.get("/", limiter, assetController.listAssets);
 router.post("/", limiter, assetController.createAsset);
 router.get("/:id", limiter, assetController.getAsset);
 router.delete("/:id", limiter, assetController.deleteAsset);
+router.put("/:id", limiter, assetController.updateAsset);
+
+
 // additional routes (update, delete, status changes, filters etc.)
 
 export default router;

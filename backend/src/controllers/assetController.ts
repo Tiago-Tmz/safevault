@@ -89,3 +89,25 @@ export async function deleteAsset(req: Request, res: Response) {
     res.status(500).json({ error: "Erro ao apagar equipamento" });
   }
 }
+export async function updateAsset(req: Request, res: Response) {
+  const id = validateId(req.params.id as string);
+  if (!id) {
+    return res.status(400).json({ error: "ID inválido" }); 
+  }
+
+  const validationError = validateAssetBody(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: validationError });
+  } 
+
+  try {
+    const updatedAsset = await assetService.updateAsset(id, req.body);
+    if (!updatedAsset) {
+      return res.status(404).json({ error: "Equipamento não encontrado" });
+    } 
+    res.json(updatedAsset);
+  } catch (err: any) {
+    console.error(err);
+    res.status(400).json({ error: err.message || "Erro ao atualizar equipamento" });
+  } 
+}
