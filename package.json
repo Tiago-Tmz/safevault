@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@prisma/client": "^7.4.2",
-    "express-rate-limit": "^8.3.1"
-  },
-  "devDependencies": {
-    "@types/node": "^25.3.3"
-  }
-}
