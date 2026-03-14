@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as assetController from "../controllers/assetController";
+import { requireAuth } from '../middlewares/auth';
 import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
@@ -9,6 +10,7 @@ const limiter = rateLimit({
 
 const router = Router();
 
+router.use(requireAuth); // todas as rotas de assets requerem autenticação
 router.get("/", limiter, assetController.listAssets);
 router.post("/", limiter, assetController.createAsset);
 router.get("/:id", limiter, assetController.getAsset);
