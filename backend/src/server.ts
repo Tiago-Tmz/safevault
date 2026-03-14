@@ -4,6 +4,7 @@ import cors from "cors";
 import assetRoutes from "./routes/assetRoutes";
 import session from "express-session";
 import authRoutes from "./routes/authRoutes";
+import employeeRoutes from './routes/employeeRoutes';
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.use(cors({ origin: "http://localhost:5173",
 
 app.use("/api/assets", assetRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/employees", employeeRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("SafeVault API is running");
