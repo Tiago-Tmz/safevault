@@ -17,6 +17,38 @@ interface User {
   email: string;
 }
 
+function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-4">
+        <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+          <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-bold text-slate-900">Apagar Equipamento</h3>
+        <p className="text-sm text-slate-500 text-center">
+          Tem a certeza que quer apagar este equipamento? 
+        </p>
+        <div className="flex gap-3 w-full mt-2">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+          >
+            Apagar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Navbar({ user, onLogout }: { user: User; onLogout: () => void }) {
   const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
 
@@ -45,6 +77,7 @@ function App() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     model: '',
@@ -104,12 +137,15 @@ function App() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteConfirmed = async () => {
+    if (confirmDeleteId === null) return;
     try {
-      await axios.delete(`http://localhost:4000/api/assets/${id}`, { withCredentials: true });
-      setAssets(assets.filter(asset => asset.id !== id));
+      await axios.delete(`http://localhost:4000/api/assets/${confirmDeleteId}`, { withCredentials: true });
+      setAssets(assets.filter(asset => asset.id !== confirmDeleteId));
     } catch (err) {
       console.error("Erro ao deletar equipamento:", err);
+    } finally {
+      setConfirmDeleteId(null);
     }
   };
 
@@ -128,6 +164,14 @@ function App() {
   // Autenticado -> mostrar inventário
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+
+      {/* Modal de confirmação */}
+      {confirmDeleteId !== null && (
+        <ConfirmDeleteModal
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
+      )}
 
       {/* Cabeçalho */}
       <Navbar user={user} onLogout={handleLogout} />
@@ -224,7 +268,7 @@ function App() {
                 </div>
 
                 <button
-                  onClick={() => handleDelete(asset.id)}
+                  onClick={() => setConfirmDeleteId(asset.id)}
                   className="mt-6 w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-lg transition-colors flex justify-center items-center gap-2"
                 >
                   Apagar
