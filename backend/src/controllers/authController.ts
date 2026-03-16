@@ -11,8 +11,19 @@ export const login = async (req: Request, res: Response) => {
   const valid = await bcrypt.compare(password, employee.password);
   if (!valid) return res.status(401).json({ error: 'Credenciais inválidas' });
 
-  req.session.user = { id: employee.id, name: employee.name, email: employee.email };
-  res.json({ id: employee.id, name: employee.name, email: employee.email });
+  req.session.user = {
+    id: employee.id,
+    name: employee.name,
+    email: employee.email,
+    isAdmin: employee.isAdmin,
+  };
+
+  res.json({
+    id: employee.id,
+    name: employee.name,
+    email: employee.email,
+    isAdmin: employee.isAdmin,
+  });
 };
 
 export const logout = (req: Request, res: Response) => {

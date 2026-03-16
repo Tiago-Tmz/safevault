@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/auth';
+import { requireAuth, requireAdmin } from '../middlewares/auth';
 import {
   listEmployees,
   createEmployee,
@@ -10,12 +10,13 @@ import {
 
 const router = Router();
 
-router.use(requireAuth);
+// Qualquer utilizador autenticado pode listar e ver employees
+router.get('/', requireAuth, listEmployees);
+router.get('/:id', requireAuth, getEmployee);
 
-router.get('/', listEmployees);
-router.post('/', createEmployee);
-router.get('/:id', getEmployee);
-router.delete('/:id', deleteEmployee);
-router.put('/:id', updateEmployee);
+// Apenas admins podem criar, editar ou apagar employees
+router.post('/', requireAdmin, createEmployee);
+router.put('/:id', requireAdmin, updateEmployee);
+router.delete('/:id', requireAdmin, deleteEmployee);
 
 export default router;

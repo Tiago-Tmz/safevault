@@ -27,6 +27,7 @@ model Employee {
   name         String
   email        String    @unique
   password     String
+  isAdmin      Boolean   @default(false)
   department   Department @relation(fields: [departmentId], references: [id])
   departmentId Int
   assets       Asset[]
