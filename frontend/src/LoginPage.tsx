@@ -13,6 +13,7 @@ const ATTEMPTS_KEY = 'login_attempts';
 
 function LoginPage({ onLogin }: Props) {
   const [formData, setFormData] = useState({ email: '', password: '' });
+
   const [error, setError] = useState<string>(() => {
   const stored = localStorage.getItem(LOCKOUT_KEY);
   if (!stored) return '';
@@ -21,6 +22,7 @@ function LoginPage({ onLogin }: Props) {
   const seconds = Math.ceil((until - Date.now()) / 1000);
   return `Demasiadas tentativas. Tenta novamente em ${seconds}s.`;
 });
+
   const [loading, setLoading] = useState(false);
 
   const [attempts, setAttempts] = useState<number>(() => {
@@ -65,7 +67,7 @@ function LoginPage({ onLogin }: Props) {
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 3) {
       setError('Password demasiado curta.');
       return;
     }
