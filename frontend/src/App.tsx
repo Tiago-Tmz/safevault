@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoginPage from './LoginPage';
 
-const API = 'http://localhost:4000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API = `${API_BASE_URL}/api`;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

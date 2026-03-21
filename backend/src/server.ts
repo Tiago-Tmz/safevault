@@ -8,6 +8,16 @@ import employeeRoutes from './routes/employeeRoutes';
 import departmentRoutes from './routes/departmentRoutes';
 
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret || sessionSecret.length < 32) {
+  throw new Error('SESSION_SECRET é obrigatório e deve ter pelo menos 32 caracteres');
+}
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
 
 app.use(express.json());
 
@@ -18,11 +28,13 @@ app.use(cors({ origin: "http://localhost:5173",
 
 
  app.use(session({
-  secret: process.env.SESSION_SECRET || "secret",
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 // 1 dia
   }
 }));

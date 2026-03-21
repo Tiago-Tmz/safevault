@@ -13,6 +13,7 @@ async function main() {
   }
 
   const adminEmail = 'admin@safevault.pt';
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
   const existing = await prisma.employee.findUnique({ where: { email: adminEmail } });
 
   if (existing) {
@@ -23,7 +24,11 @@ async function main() {
     });
     console.log(`Conta admin já existe (${adminEmail}) — isAdmin atualizado para true.`);
   } else {
-    const hashed = await bcrypt.hash('admin123', 10);
+    if (!adminPassword || adminPassword.length < 12) {
+      throw new Error('ADMIN_SEED_PASSWORD é obrigatória e deve ter pelo menos 12 caracteres');
+    }
+
+    const hashed = await bcrypt.hash(adminPassword, 12);
     await prisma.employee.create({
       data: {
         name: 'Administrador',
@@ -35,8 +40,8 @@ async function main() {
     });
     console.log(`Conta admin criada com sucesso!`);
     console.log(`  Email:    ${adminEmail}`);
-    console.log(`  Password: admin123`);
-    console.log(`  ⚠️  Muda a password após o primeiro login!`);
+    console.log('  Password: definida por ADMIN_SEED_PASSWORD');
+    console.log('  Muda a password após o primeiro login.');
   }
 }
 

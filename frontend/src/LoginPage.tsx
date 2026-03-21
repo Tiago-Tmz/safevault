@@ -5,7 +5,7 @@ interface Props {
   onLogin: () => void;
 }
 
-const url = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 30_000;
 const LOCKOUT_KEY = 'login_locked_until';
@@ -76,7 +76,7 @@ function LoginPage({ onLogin }: Props) {
     setError('');
 
     try {
-      await axios.post(`${url}/api/auth/login`, formData, {
+      await axios.post(`${API_BASE_URL}/api/auth/login`, formData, {
         timeout: 5000,
         withCredentials: true,
       });
