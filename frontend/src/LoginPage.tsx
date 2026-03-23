@@ -8,8 +8,40 @@ interface Props {
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 30_000;
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
 const LOCKOUT_KEY = 'login_locked_until';
 const ATTEMPTS_KEY = 'login_attempts';
+
+type AttemptsState = {
+  count: number;
+  updatedAt: number;
+};
+
+const readAttemptsState = (): AttemptsState => {
+  const stored = localStorage.getItem(ATTEMPTS_KEY);
+  if (!stored) return { count: 0, updatedAt: 0 };
+
+  try {
+    const parsed = JSON.parse(stored) as AttemptsState;
+    const isExpired = Date.now() - parsed.updatedAt > ATTEMPT_WINDOW_MS;
+    if (!parsed.count || isExpired) {
+      localStorage.removeItem(ATTEMPTS_KEY);
+      return { count: 0, updatedAt: 0 };
+    }
+    return parsed;
+  } catch {
+    localStorage.removeItem(ATTEMPTS_KEY);
+    return { count: 0, updatedAt: 0 };
+  }
+};
+
+const writeAttemptsState = (state: AttemptsState) => {
+  if (state.count <= 0) {
+    localStorage.removeItem(ATTEMPTS_KEY);
+    return;
+  }
+  localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(state));
+};
 
 function LoginPage({ onLogin }: Props) {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -26,8 +58,7 @@ function LoginPage({ onLogin }: Props) {
   const [loading, setLoading] = useState(false);
 
   const [attempts, setAttempts] = useState<number>(() => {
-    const stored = localStorage.getItem(ATTEMPTS_KEY);
-    return stored ? parseInt(stored) : 0;
+    return readAttemptsState().count;
   });
 
   const [lockedUntil, setLockedUntil] = useState<number | null>(() => {
@@ -47,7 +78,7 @@ function LoginPage({ onLogin }: Props) {
     setLockedUntil(null);
     setAttempts(0);
     localStorage.removeItem(LOCKOUT_KEY);
-    localStorage.removeItem(ATTEMPTS_KEY);
+    writeAttemptsState({ count: 0, updatedAt: 0 });
   };
 
   const validateEmail = (email: string) =>
@@ -86,7 +117,7 @@ function LoginPage({ onLogin }: Props) {
     } catch (err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
-      localStorage.setItem(ATTEMPTS_KEY, String(newAttempts));
+      writeAttemptsState({ count: newAttempts, updatedAt: Date.now() });
 
       if (newAttempts >= MAX_ATTEMPTS) {
         lock();

@@ -408,7 +408,7 @@ function EmployeesTab() {
 
           <button type="submit"
             className="mt-2 w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-            Criar Colaborador
+            Adicionar Colaborador
           </button>
         </div>
       </form>
