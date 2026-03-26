@@ -41,8 +41,12 @@ export default function InventoryTab() {
       );
       setFormData({ model: '', category: '', serialNumber: '', value: '' });
       fetchAssets();
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao adicionar equipamento.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError<{ error?: string }>(err)) {
+        setError(err.response?.data?.error || 'Erro ao adicionar equipamento.');
+      } else {
+        setError('Erro ao adicionar equipamento.');
+      }
     }
   };
 

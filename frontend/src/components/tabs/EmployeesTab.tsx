@@ -55,8 +55,12 @@ export default function EmployeesTab() {
       setFormData({ name: '', email: '', password: '', departmentId: '' });
       setSuccess('Colaborador criado com sucesso!');
       fetchAll();
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao criar colaborador.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError<{ error?: string }>(err)) {
+        setError(err.response?.data?.error || 'Erro ao criar colaborador.');
+      } else {
+        setError('Erro ao criar colaborador.');
+      }
     }
   };
 
@@ -70,8 +74,12 @@ export default function EmployeesTab() {
       await axios.delete(`${API}/employees/${confirmDeleteId}`, { withCredentials: true });
       setEmployees(employees.filter((e) => e.id !== confirmDeleteId));
       setSuccess('Colaborador removido.');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao apagar colaborador.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError<{ error?: string }>(err)) {
+        setError(err.response?.data?.error || 'Erro ao apagar colaborador.');
+      } else {
+        setError('Erro ao apagar colaborador.');
+      }
     } finally {
       setConfirmDeleteId(null);
     }

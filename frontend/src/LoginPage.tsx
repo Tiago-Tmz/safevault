@@ -114,7 +114,7 @@ function LoginPage({ onLogin }: Props) {
 
       unlock();
       onLogin();
-    } catch (err) {
+    } catch {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       writeAttemptsState({ count: newAttempts, updatedAt: Date.now() });

@@ -43,8 +43,12 @@ export default function DepartmentsTab() {
       setFormData({ name: '', location: '' });
       setSuccess('Departamento criado com sucesso.');
       fetchDepartments();
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao criar departamento.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError<{ error?: string }>(err)) {
+        setError(err.response?.data?.error || 'Erro ao criar departamento.');
+      } else {
+        setError('Erro ao criar departamento.');
+      }
     }
   };
 
@@ -60,8 +64,12 @@ export default function DepartmentsTab() {
       await axios.delete(`${API}/departments/${confirmDeleteId}`, { withCredentials: true });
       setDepartments(departments.filter((d) => d.id !== confirmDeleteId));
       setSuccess('Departamento removido.');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao remover departamento.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError<{ error?: string }>(err)) {
+        setError(err.response?.data?.error || 'Erro ao remover departamento.');
+      } else {
+        setError('Erro ao remover departamento.');
+      }
     } finally {
       setConfirmDeleteId(null);
     }
